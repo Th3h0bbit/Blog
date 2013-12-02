@@ -1,0 +1,38 @@
+//Photo_diode_and_proximity_sensor
+
+const int pir = 8; // passive infared sensor
+const int ledPin = 12;
+const int lres = 0; // light resistor
+
+ 
+void setup()
+{
+  pinMode(pir, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(lres, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  //read pir for movement
+  int i = digitalRead(pir);
+  Serial.println(i);
+  
+  //analog read lres 
+  int val = analogRead(lres);
+  val = constrain (val, 0, 600);
+  int ledval = map(val, 0, 600, 0, 255);
+  //Serial.println(ledval);
+  
+  
+  if (ledval >= 200 && i == HIGH)
+  //if the room is dark and movement is detected
+{
+    digitalWrite(ledPin, HIGH);
+    delay(18000);
+}
+else
+{
+  digitalWrite(ledPin, LOW);
+}
+}
