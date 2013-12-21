@@ -1,0 +1,29 @@
+const int ledPin = 13;
+const int relayPin = 2;
+const int soundsensor = 3; 
+
+int sensorreading = 0;  //variable to store sensor reading
+int ledstate = LOW;  //variable to store and toggle LED status
+
+void setup()
+{
+  pinMode(ledPin, OUTPUT);
+  pinMode(relayPin, OUTPUT);
+  pinMode(soundsensor, INPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  sensorreading = digitalRead(soundsensor);
+  Serial.println(sensorreading);
+  if(sensorreading == LOW)
+  {
+    ledstate = !ledstate;  //ledstate changes 3 times to sync the 
+    digitalWrite(ledPin, ledstate);
+    ledstate = !ledstate;  // relay and LED together.
+    digitalWrite(relayPin, ledstate);
+    ledstate = !ledstate;
+    delay(150);
+  }
+}
