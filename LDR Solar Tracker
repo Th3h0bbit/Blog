@@ -1,0 +1,44 @@
+#include <Servo.h>
+
+Servo servo;
+int pos = 0;
+
+int ldrPinl = A1;
+int ldrPinr = A2;
+
+void setup() 
+{
+Serial.begin(9600);
+servo.attach(9);
+pinMode(ldrPinl, INPUT);
+pinMode(ldrPinr, INPUT);
+
+}
+
+void loop() 
+{
+  int left = analogRead(ldrPinl);
+  int right = analogRead(ldrPinr);
+  
+  if(left>(right+10))
+  {
+    if (pos < 179)
+    pos++;
+    servo.write(pos);
+    }
+    if(right>(left+10))
+    {
+      if (pos > 1)
+      pos -=1;
+      servo.write(pos);
+    }  
+  
+   delay(50);
+   {
+  Serial.print("left "); Serial.print(left);
+  Serial.print("- ");Serial.print(pos);Serial.print(" -");
+  Serial.print("right "); Serial.println(right);
+  }
+}
+
+  //Serial.println(analogRead(ldrPinl));
