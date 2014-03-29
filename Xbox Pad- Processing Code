@@ -1,0 +1,80 @@
+//Processing Code
+
+import processing.serial.*;
+import controlP5.*;
+import procontroll.*;
+import net.java.games.input.*;
+ControlP5 cp5;
+int temp = 0;
+int tempt= 0;
+int pan = 180;
+int tilt = 180;
+Serial port;
+
+ControllIO controll;
+ControllDevice XBOXCONTROLLER;
+ControllStick leftStick;
+ControllStick rightStick;
+ControllButton L3;
+ControllButton R3;
+
+void setup()
+{
+  
+  size(640, 640);
+  println(Serial.list());
+  port = new Serial(this, Serial.list()[0],9600);
+  cp5 = new ControlP5(this);
+
+  cp5.addSlider("pan")
+  .setPosition(60,500)
+  .setSize(100,10)
+  .setRange(0,180)
+  .setValue(90)
+  ;  
+  //,0,179,90,60,500,10,100);
+  
+  cp5.addSlider("tilt")
+  .setPosition(110,520)
+  .setSize(10,100)
+  .setRange(0,180)
+  .setValue(90)
+  ;  
+  //,0,179,90,60,500,100,10);
+  
+  cp5.addBang("Fire",180,540,20,20);
+  
+  controll = ControllIO.getInstance(this); 
+  XBOXCONTROLLER = controll.getDevice("Controller");  
+  XBOXCONTROLLER.printSliders();
+  XBOXCONTROLLER.printButtons();
+  leftStick = new ControllStick(XBOXCONTROLLER.getSlider(1), XBOXCONTROLLER.getSlider(0));
+  rightStick = new ControllStick(XBOXCONTROLLER.getSlider(1), XBOXCONTROLLER.getSlider(0)); 
+}
+
+void draw()
+{
+  //noStroke();
+  background(0);
+  leftStick = XBOXCONTROLLER.getStick(0);
+  rightStick = XBOXCONTROLLER.getStick(2);
+  temp=(int) map(leftStick.getX(), -1, 1, 0, 180);
+//  temp=temp+77;  // setting new default position of gimbal.
+  tempt=(int) map(leftStick.getY(), -1, 1, 0, 180);
+//  tempt=tempt+77;
+  println(temp);
+  port.write("a"+temp);
+  port.write("b"+tempt);
+//  println("a"+temp);
+//  println("b"+tilt);
+  delay(10);
+}
+
+void controlEvent(ControlEvent theEvent) {
+  
+  if(theEvent.isController()){
+    if(theEvent.controller().name()=="Fire") {
+      port.write("c");
+    }
+  }
+}
