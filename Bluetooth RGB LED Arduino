@@ -1,0 +1,43 @@
+int RVal = 11;//pin10
+int GVal = 10;//pin9
+int BVal = 9;//pin11
+
+void setup()
+{
+  pinMode(RVal, OUTPUT);
+  pinMode(GVal, OUTPUT);
+  pinMode(BVal, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("READY");
+}
+
+void loop()
+{
+  static int v = 0;
+  
+  if ( Serial.available()) {
+    char ch = Serial.read();
+
+    switch(ch) {
+      case '0'...'9':
+        v = v * 10 + ch - '0';
+        Serial.println(v);//debug
+        break;
+      case 'r':
+        analogWrite(RVal, v);
+        //Serial.println(v);
+        v = 0;
+        break;
+      case 'g':
+        analogWrite(GVal, v);
+        //Serial.println(v);
+        v = 0;
+        break;
+      case 'b':
+        analogWrite(BVal, v);
+        //Serial.println(v);
+        v = 0;
+        break;
+    }
+  }
+}
