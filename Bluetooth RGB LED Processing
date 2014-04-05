@@ -1,0 +1,64 @@
+import processing.serial.*;
+Serial port;
+import controlP5.*;
+ControlP5 cp5;
+
+int RVal = 125;
+int GVal = 125;
+int BVal = 125;
+Knob myknobR; 
+Knob myknobG; 
+Knob myknobB; 
+
+int myColorBackground = color(0,0,0);
+
+void setup()
+{
+  size(640, 240);
+  smooth();
+  
+  println(Serial.list());
+  port = new Serial(this, Serial.list()[2],9600);
+  
+  cp5 = new ControlP5(this);
+  myknobR = cp5.addKnob("RVal")
+               .setRange(0,255)
+               .setValue(50)
+               .setPosition(80,70)
+               .setRadius(50)
+               .setDragDirection(Knob.VERTICAL)
+               ;
+               
+  myknobG = cp5.addKnob("GVal")
+               .setRange(0,255)
+               .setValue(50)
+               .setPosition(230,70)
+               .setRadius(50)
+               .setDragDirection(Knob.VERTICAL)
+               ;
+               
+  myknobB = cp5.addKnob("BVal")
+               .setRange(0,255)
+               .setValue(50)
+               .setPosition(380,70)
+               .setRadius(50)
+               .setDragDirection(Knob.VERTICAL)
+               ; 
+}
+
+
+void draw()
+{
+  //noStroke();
+  background(0);
+  port.write("r"+RVal);
+  port.write("g"+GVal);
+  port.write("b"+BVal);
+  println("R"+RVal);
+  println("G"+GVal);
+  println("B"+BVal);
+  delay(10);
+}
+  
+  
+  
