@@ -1,0 +1,63 @@
+// The only little nag is that when i wanted to be "trigger happy" with the mouse.
+// The problem is that when the mouse is pressed and the audio has not finished playing 
+// a new mp3 is played but the old continues to play in the back gound.
+// Ive left in the stop functions in case i find a solution one day
+
+PImage img;
+Arnold arnold;
+import ddf.minim.*;
+Minim minim;
+AudioPlayer player;
+
+
+void setup() {
+  arnold = new Arnold();
+  minim = new Minim(this);
+  size (640, 640);
+  background(0);
+  noStroke();
+}
+
+void draw() {
+  if (mousePressed) {
+    arnold.randomPic();
+    //arnold.stopMp3();
+    arnold.playrandomMp3();
+    delay(100);
+  }
+}
+
+class Arnold {
+
+  Arnold() {
+  }
+
+  void randomPic () {
+    String t = str(int(random(1, 13))); //random float to int to string
+    String[] picDir = new String[3];
+    picDir[0] = "Arnold_";
+    picDir[1] = t;
+    picDir[2] = ".jpg";
+
+    String picdirFinal = join(picDir, ""); 
+    img = loadImage(picdirFinal);
+    img.resize(width, height);  //resizes image to canvas size!
+    background(img);
+  }
+
+  void playrandomMp3 () {
+    String t = str(int(random(1, 13)));
+    String[] mp3Dir = new String[3];
+    //random number added
+    mp3Dir[0] = "Arnoldwav_";
+    mp3Dir[1] = t;
+    mp3Dir[2] = ".mp3";
+    String mp3dirFinal = join(mp3Dir, ""); 
+    player = minim.loadFile(mp3dirFinal);
+    player.play();
+  }
+
+  void stopMp3 () {
+    //player.stop();
+  }
+}
