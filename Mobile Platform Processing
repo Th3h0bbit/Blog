@@ -1,0 +1,64 @@
+import processing.serial.*;
+import procontroll.*;
+import java.io.*;
+
+
+Serial port;
+ControllIO controllIO;
+ControllDevice xboxPad;
+ControllStick leftStick;
+ControllSlider trigger;
+
+
+int xVal = 0;    //left thumb stick x val
+int yVal = 0;    //left thumb stick y val
+int zVal = 0;    //left and right trigger values
+String txString; // string sent over serial
+
+void setup()
+{
+size(640,640);
+println(Serial.list());    //prints available com ports
+port = new Serial(this, Serial.list()[2],9600);    //connect to 3rd comport in list at baud 9600 BT module is this rate by default 
+controllIO = ControllIO.getInstance(this);    
+xboxPad = controllIO.getDevice("Controller (Xbox 360 Wireless Receiver for Windows)");    //attaches device to "xboxPad"
+xboxPad.printSliders();   
+
+ControllSlider sliderY = xboxPad.getSlider(0);    // ataches slider to sliderY
+ControllSlider sliderX = xboxPad.getSlider(1);
+leftStick = new ControllStick(sliderY, sliderX);
+
+ControllSlider sliderZ = xboxPad.getSlider(4);
+trigger = sliderZ;
+}
+
+void draw()
+{
+  yVal = (int) map(leftStick.getX(), -1, 1, 255, 0);    // gets the value from left thumb stick and maps it from 255 to 0.
+  xVal = (int) map(leftStick.getY(), -1, 1, 255, 0);  
+  zVal = (int) map(trigger.getValue(), -1.5, 1.5, 100, 0);  //right trigger value is taken from pad then mapped from 100 to 0
+  
+  if (zVal >= 55 && xVal <=145 && xVal >= 110)  {    // sends different letters over serial to tell robot which way to go 
+  txString = "a";                                    // depending on position of left thumbstick
+  }
+ else if (zVal <= 45 && xVal <=145 && xVal >= 110)  {
+  txString = "b";
+  }
+  else  {
+    txString = "e";
+  }
+
+  if(xVal <= 80)  {
+  txString = "d";
+  }
+else if (xVal >= 200)  {
+  txString = "c";
+  }
+
+  zVal = (int) map(zVal, 83, 16, 255, 0);
+
+  println(txString+zVal);    // debug
+  port.write(txString+zVal);    // send over serial
+  println(xVal);    //debug
+  delay(10);
+  }
