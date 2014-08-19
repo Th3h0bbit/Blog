@@ -1,0 +1,86 @@
+const int leftTrack1 = 2;    //Motor Pins
+const int leftTrack2 = 3;
+const int rightTrack1 = 4;
+const int rightTrack2 = 5;
+static int v = 0;
+
+void setup()
+{
+  pinMode(leftTrack1, OUTPUT);
+  pinMode(leftTrack2, OUTPUT);
+  pinMode(rightTrack1, OUTPUT);
+  pinMode(rightTrack2, OUTPUT);
+  Serial.begin(9600);
+  //delay(4000);
+  Serial.println("READY");
+}
+
+void forward()  {
+  analogWrite(leftTrack1, v);
+  analogWrite(leftTrack2, LOW);
+  analogWrite(rightTrack1, LOW); 
+  analogWrite(rightTrack2, v);
+  v = 0;
+}
+
+void backward()  {
+  v = map(v, 0, 110, 255, 0);    // had to remap this so left trigger- 
+  analogWrite(leftTrack1, LOW);  // increases value not decreses when pressed
+  analogWrite(leftTrack2, v);
+  analogWrite(rightTrack1, v); 
+  analogWrite(rightTrack2, LOW);
+  v = 0;
+}
+
+void left()  {
+  analogWrite(leftTrack1, LOW);
+  analogWrite(leftTrack2, v);
+  analogWrite(rightTrack1, LOW); 
+  analogWrite(rightTrack2, v);
+  v = 0;
+}
+
+void right()  {
+  analogWrite(leftTrack1, v);
+  analogWrite(leftTrack2, LOW);
+  analogWrite(rightTrack1, v); 
+  analogWrite(rightTrack2, LOW);
+  v = 0;
+}
+
+void halt()  {
+  analogWrite(leftTrack1, LOW);
+  analogWrite(leftTrack2, LOW);
+  analogWrite(rightTrack1, LOW); 
+  analogWrite(rightTrack2, LOW);
+  v = 0;
+}
+
+void loop()
+{
+  if ( Serial.available()) {
+    char ch = Serial.read();
+
+    switch(ch) {
+    case '0'...'9':
+      v = v * 10 + ch - '0';
+      Serial.println(v);//debug
+      break;
+    case 'a':  //FWD
+      forward();
+      break;
+    case 'b':  //REV
+      backward();
+      break;
+    case 'c':  //LEFT
+      left();
+      break;
+    case 'd':  //RIGHT  
+      right();
+      break;
+    case 'e':  //STOP  
+      halt();
+      break;
+    }
+  }
+} 
