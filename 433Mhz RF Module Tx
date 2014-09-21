@@ -1,0 +1,96 @@
+#include <VirtualWire.h>
+
+const int Rval = 9;
+const int Gval = 10;
+const int Bval = 11;
+
+//int Sensor1Data;
+int ButtonData;
+char ButtonCharMsg[2]; 
+
+// Sensors 
+const int buttonPin = 2;     // the number of the pushbutton pin
+// variables will change:
+boolean ledon = false;         // variable for reading the pushbutton status
+boolean lastbutton = LOW;
+boolean currentbutton = LOW;
+int counter = 0;              // variable for keeping track of colours
+
+void setup()
+{
+  // PinModes 
+  pinMode(Rval, OUTPUT);
+  pinMode(Gval, OUTPUT);
+  pinMode(Bval, OUTPUT);
+  // Serial Coms
+  Serial.begin(9600);
+  Serial.println("READY");
+  // Sensor(s)
+  pinMode(buttonPin, INPUT);
+  // Initialise the IO and ISR
+  vw_set_ptt_inverted(true); // Required for DR3100
+  vw_setup(2000);	 // Bits per sec
+}
+
+void loop()
+{
+  buttonPressed();
+  // Read and store Sensor 1 data
+  ButtonData = counter; 
+  // DEBUG
+  Serial.print("Sensor1 Integer: ");
+  Serial.print(ButtonData);
+  // Convert integer data to Char array directly 
+  itoa(ButtonData,ButtonCharMsg,10);
+  Serial.print(" Sensor1 CharMsg: ");
+  Serial.print(ButtonCharMsg);
+  Serial.println(" ");
+  // END DEBUG
+  changeColour();
+  TXint();
+}
+
+boolean debounce(boolean last)
+{
+  boolean current = digitalRead(buttonPin);
+  if (last != current)
+  {
+    delay(5);
+    current = digitalRead(buttonPin);
+    return current;
+  }
+}
+
+void buttonPressed(){
+  currentbutton = debounce(lastbutton);
+  if (lastbutton == LOW && currentbutton == HIGH)
+  {
+    ++counter;
+  }
+  lastbutton = currentbutton;
+
+  if (counter == 3){
+    counter = 1;
+  }
+}
+
+void changeColour(){
+  if (counter == 1)
+  {
+    analogWrite(Rval, 255);
+    analogWrite(Gval, 0);
+    analogWrite(Bval, 0);
+    delay(250);
+  }
+  if (counter == 2){
+    analogWrite(Rval, 0);
+    analogWrite(Gval, 255);
+    analogWrite(Bval, 0);
+    delay(250);
+  } 
+}     
+
+void TXint(){
+  vw_send((uint8_t *)ButtonCharMsg, strlen(ButtonCharMsg));
+  vw_wait_tx(); // Wait until the whole message is gone  
+}
