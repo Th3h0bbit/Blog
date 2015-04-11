@@ -1,0 +1,58 @@
+#include "LedControl.h"
+
+LedControl lc = LedControl(12, 11, 10, 1); // Pins: DIN,CLK,CS, # of Display connected
+
+void setup()
+{
+  lc.shutdown(0, false); // Wake up displays
+  lc.setIntensity(0, 1); // Set intensity levels
+  lc.clearDisplay(0);  // Clear Displays
+  Serial.begin(9600);
+}
+
+void trickleDown() {
+  int x, y;
+  for (y = 0; y < 8; y++) {
+    for (x = 0; x < 8; x++) {
+      Serial.print(x);
+      Serial.print("\t");
+      Serial.println(y);
+      lc.setLed(0, y, x, true);
+      delay(50);
+      lc.clearDisplay(0);  // Clear Displays
+    }
+    if ( x == 8) {
+      x = 0;
+    }
+    else if ( y == 8) {
+      y = 0;
+    }
+  }
+}
+
+void square() {
+  int i, j;
+  for (i = 0, j = 7; i < 8; i++, j--) {
+    Serial.print(i);
+    Serial.print("\t");
+    Serial.println(j);
+    lc.setRow(0, i, B11111111);
+    lc.setRow(0, j, B11111111);
+    lc.setColumn(0, i, B11111111);
+    lc.setColumn(0, j, B11111111);
+    delay(500);
+    lc.clearDisplay(0);  // Clear Displays
+  }
+
+  if (i == 8 && j == 0) {
+    i = 0;
+    j = 8;
+  }
+}
+
+
+void loop()
+{
+  trickleDown();
+  square();
+}
